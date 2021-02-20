@@ -24,11 +24,10 @@ class UsersController extends ApiController
             return $this->fail('','',$validator->errors()->first());
         }
         $user = $this->UserServices->login($request->all());
-//        $token = $this->UserServices->getToken();
-//        if ( !$token ) {
-//            return $this->fail('',500,'token异常，请稍后再试');
-//        }
-
+        if (is_string( $user )) {
+            return $this->fail('',500,$user);
+        }
+        return $this->success($user,200,'登录成功');
     }
 
 
