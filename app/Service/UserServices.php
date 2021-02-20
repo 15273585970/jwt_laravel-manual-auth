@@ -87,4 +87,34 @@ class UserServices
             return  $e->getMessage();
         }
     }
+
+
+    /**
+     * 验证token是否正常
+     * @param $token token值
+     */
+    public function checkToken( $token )
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $result = UsersToken::where('token',$token)->first();
+        if (!$result) {
+            return false;
+        }
+        //判断token是否过期
+        if ( $result['express_at'] <= $now_date ) {
+            $result->uodate_at = $now_date;
+            $result->delete_at = $now_date;
+            $result->state = UsersTokenState::过期;
+            $result->save();
+        }
+        if ( $result->state == UsersTokenState::过期 ) {
+            return false;
+        }
+        $user = Users::where('id',$result->users_id)->first();
+        if (!$user) {
+            return false;
+        }
+        $result->token = $token;
+        return $user;
+    }
 }
