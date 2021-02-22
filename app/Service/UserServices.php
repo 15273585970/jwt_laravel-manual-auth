@@ -89,6 +89,7 @@ class UserServices
     }
 
 
+
     /**
      * 验证token是否正常
      * @param $token token值
