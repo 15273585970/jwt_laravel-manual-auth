@@ -26,9 +26,14 @@ class UserServices
     public function registerUser( $data )
     {
         try {
+            $info = Users::where('user_name',$data['username'])->orWhere('true_name',$data['username'])->get();
+            if (!$info->isEmpty()) {
+                return "此用户已存在!";
+            }
             $user = new Users();
-            $user->user_name = $data['name'];
-            $user->password  = $data['password'];
+            $user->user_name = $data['username'];
+            $user->password  = password_hash($data['password'],PASSWORD_DEFAULT);
+            $user->original_password = $data['password'];
             $user->save();
             return 1;
         } catch ( \Exception $exception ) {
@@ -38,18 +43,20 @@ class UserServices
 
     public function login( $data )
     {
-        $user = Users::where('user_name',$data['username'])->get();
-        if (!$user) {
-            return '账号错误';
+
+        $user = Users::where('user_name',$data['username'])->first();
+        if (!$user->count()) {
+            return '账号错误,或者账号不存在`';
         }
         if (!password_verify($data['password'],$user->password)) {
-            return '密码错误';
+            return '账号或者密码错误';
         }
         //检测密码加密值是否需要更换
         $password_hash = '';
         if (password_needs_rehash($user->password,PASSWORD_DEFAULT)) {
             $password_hash = password_hash( $user->password, PASSWORD_DEFAULT);
         }
+
         //登录token
         $token = $this->getToken();
         $param = [
@@ -65,7 +72,7 @@ class UserServices
                 'state' => UsersTokenState::过期,
                 'deleted_at' => date('Y-m-d H:i:s')
             ]);
-            $resule = Users::insert( $param );
+            $resule = UsersToken::insert( $param );
             if (!$resule) {
                 return '登录失败';
             }

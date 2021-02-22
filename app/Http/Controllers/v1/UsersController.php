@@ -58,7 +58,7 @@ class UsersController extends ApiController
         }
         $result = $this->userServices->registerUser($request->all());
         if (!is_numeric($result)) {
-            return $this->fail('', 500, $request);
+            return $this->fail('', 500, $result);
         }
         return $this->success('', 200, '注册成功');
     }

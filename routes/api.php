@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
+//Route::get('login',"v1\UsersController@login");
 Route::group([
     'prefix' => 'user'
 ],function(){
