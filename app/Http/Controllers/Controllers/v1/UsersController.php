@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 use App\Service\UserServices;
 class UsersController extends ApiController
 {
+    protected $UserServices;
+    public function __construct(UserServices $UserServices)
+    {
+        $this->UserServices = $UserServices;
+    }
+
     public function login(Request $request)
     {
         //验证用户信息
@@ -48,7 +54,7 @@ class UsersController extends ApiController
         if ( $validator->fails() ) {
             return $this->fail('','',$validator->errors()->first());
         }
-        $result = $this->UserService->registerUser( $request->all() );
+        $result = $this->UserServices->registerUser( $request->all() );
         if ( !is_numeric( $result ) ) {
             return $this->fail('',500,$request);
         }
