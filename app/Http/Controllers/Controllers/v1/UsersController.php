@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Controllers\v1;
+namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Controller;
@@ -8,32 +8,34 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Service\UserServices;
+
 class UsersController extends ApiController
 {
-    protected $UserServices;
-    public function __construct(UserServices $UserServices)
+    protected $userServices;
+
+    public function __construct(UserServices $userServices)
     {
-        $this->UserServices = $UserServices;
+        $this->userServices = $userServices;
     }
 
     public function login(Request $request)
     {
         //验证用户信息
-        $validator = Validator::make( $request->all(),[
+        $validator = Validator::make($request->all(), [
             'username' => 'required',
             'password' => 'required'
-        ],[
+        ], [
             'username.required' => '用户名为必填项',
             'password.required' => '密码为必填项'
         ]);
-        if ( $validator->fails() ) {
-            return $this->fail('','',$validator->errors()->first());
+        if ($validator->fails()) {
+            return $this->fail('', '', $validator->errors()->first());
         }
-        $user = $this->UserServices->login($request->all());
-        if (is_string( $user )) {
-            return $this->fail('',500,$user);
+        $user = $this->userServices->login($request->all());
+        if (is_string($user)) {
+            return $this->fail('', 500, $user);
         }
-        return $this->success($user,200,'登录成功');
+        return $this->success($user, 200, '登录成功');
     }
 
 
@@ -44,20 +46,20 @@ class UsersController extends ApiController
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'username' => 'required',
             'password' => 'required'
-        ],[
+        ], [
             'username.required' => '用户名为必填项',
             'password.required' => '密码为必填项'
         ]);
-        if ( $validator->fails() ) {
-            return $this->fail('','',$validator->errors()->first());
+        if ($validator->fails()) {
+            return $this->fail('', '', $validator->errors()->first());
         }
-        $result = $this->UserServices->registerUser( $request->all() );
-        if ( !is_numeric( $result ) ) {
-            return $this->fail('',500,$request);
+        $result = $this->userServices->registerUser($request->all());
+        if (!is_numeric($result)) {
+            return $this->fail('', 500, $request);
         }
-        return $this->success('',200,'注册成功');
+        return $this->success('', 200, '注册成功');
     }
 }
